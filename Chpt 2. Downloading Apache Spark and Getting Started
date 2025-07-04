@@ -1,1 +1,56 @@
-aoeu
+# Databricks notebook source
+import sys
+
+from pyspark.sql import SparkSession
+from pyspark.sql.functions import count
+
+# COMMAND ----------
+
+mnm_file = sys.argv[1]
+
+mnm_df = (spark.read.format("csv")
+.option("header", "true")
+.option("inferSchema", "true")
+.load(mnm_file))
+
+
+# COMMAND ----------
+
+mnm_df = spark.sql("SELECT * FROM `workspace`.`default`.`mnm_dataset`")
+
+display(mnm_df)
+
+
+
+# COMMAND ----------
+
+from pyspark.sql.functions import count
+
+mnm_df.select("State", "Color", "Count") \
+    .groupBy("State", "Color") \
+    .agg(count("Count").alias("Total")) \
+    .show()
+
+# COMMAND ----------
+
+from pyspark.sql.functions import count
+
+count_mnm_df = (mnm_df
+    .select("State", "Color", "Count")
+    .groupBy("State", "Color")
+    .agg(count("Count").alias("Total"))
+    .orderBy("Total", ascending=False))
+
+display(count_mnm_df)
+
+# COMMAND ----------
+
+from pyspark.sql.functions import *
+data_df = spark.createDataFrame([("Brooke", 20), ("Denny", 31), ("Jules", 30), ("TD", 35), ("Brooke", 25)], ["name", "age"])
+
+avg_df = data_df.groupBy("name").agg(avg("age"))
+
+avg_df.show()
+
+# COMMAND ----------
+
